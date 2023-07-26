@@ -1,21 +1,23 @@
 {
   "name": "multiplication-table-quiz",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --port=3000 --host",
     "build": "vite build",
-    "preview": "vite preview --port 8080 --host"
+    "preview": "vite preview --port=8080 --host",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^1.1.4",
-    "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.6",
-    "tailwindcss": "^3.0.18",
-    "vite": "^2.7.13"
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.14",
+    "gh-pages": "^5.0.0",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.7"
   }
 }
