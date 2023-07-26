@@ -11,53 +11,60 @@ const LSKEY = 'amv1017-multiplication-table-quiz'
 const num = () => Math.floor(2 + Math.random() * 8)
 
 const generateAnother = (x) => {
-  while (true) {
-    let y = num()
-    if (x != y) {
-      return y
-    }
-  }
+  const r = num()
+  return r === x ? generateAnother(x) : r
 }
 
 const App = () => {
-  const [answered, setAnswered] = useState(false)
-  const [correct, setCorrect] = useState(false)
-  const [step, setStep] = useState(+window.localStorage.getItem(LSKEY) || 0)
-  const [values, setValues] = useState({ a: num(), b: num(), c: 0, p: false })
-  const [supposed, setSupposed] = useState('')
-  const [desired, setDesired] = useState(0)
+  const [state, setState] = useState({
+    answered: false,
+    correct: false,
+    step: +window.localStorage.getItem(LSKEY) || 0,
+    a: num(),
+    b: num(),
+    c: 0,
+    first: false,
+    supposed: '',
+    desired: 0,
+  })
+  const [refresh, setRefresh] = useState(0)
+
+  const { a, b, c, first, desired, supposed, answered, correct } = state
 
   useEffect(() => {
-    const va = generateAnother(values.a)
-    const vb = generateAnother(values.b)
+    const va = generateAnother(a)
+    const vb = generateAnother(b)
     const vc = va * vb
     const vp = Math.random() > 0.5
 
-    setDesired(!vp ? vc : vb)
-    setValues({ a: va, b: vb, c: vc, p: vp })
-  }, [step])
+    setState({
+      ...state,
+      desired: !vp ? vc : vb,
+      a: va,
+      b: vb,
+      c: vc,
+      first: vp,
+    })
+  }, [refresh])
 
   const onCheck = () => {
-    setAnswered(true)
     const check = desired == parseInt(supposed)
-    setCorrect(check)
+    setState({ ...state, answered: true, correct: check })
     setTimeout(() => {
+      let step = 0
       if (check) {
-        setSupposed('')
-        setStep(step + 1)
-        window.localStorage.setItem(LSKEY, step + 1)
-      } else {
-        setSupposed('')
-        setStep(0)
-        window.localStorage.setItem(LSKEY, 0)
+        setRefresh((r) => r + 1)
+        step = state.step + 1
       }
-      setAnswered(false)
+
+      setState({ ...state, answered: false, supposed: '', step })
+      window.localStorage.setItem(LSKEY, step)
     }, TIMEOUT)
   }
 
   const valChange = (e) => {
     e.preventDefault()
-    setSupposed(e.target.value)
+    setState({ ...state, supposed: e.target.value })
   }
 
   return (
@@ -68,23 +75,23 @@ const App = () => {
         </div>
         {/* <div className="mb-4">{`${values.a}×${values.b}=${values.c}`}</div> */}
         <div className="flex flex-row justify-center text-5xl mb-4">
-          <Label text={`${values.a}×`} />
-          {values.p ? (
+          <Label text={`${a}×`} />
+          {first ? (
             <Answer
               value={supposed !== '' ? parseInt(supposed) : ''}
               onChange={valChange}
             />
           ) : (
-            <Label text={values.b} />
+            <Label text={b} />
           )}
           <Label text={'='} />
-          {!values.p ? (
+          {!first ? (
             <Answer
               value={supposed !== '' ? parseInt(supposed) : ''}
               onChange={valChange}
             />
           ) : (
-            <Label text={values.c} />
+            <Label text={c} />
           )}
         </div>
         <button
@@ -93,16 +100,11 @@ const App = () => {
         >
           Проверить
         </button>
-        {answered && (
-          <Result
-            answer={correct}
-            notice={`${values.a}×${values.b}=${values.c}`}
-          />
-        )}
+        {answered && <Result answer={correct} notice={`${a}×${b}=${c}`} />}
       </div>
       <div className="absolute bottom-6 left-6 bg-emerald-300 rounded-md p-2">
         <span>Личный рекорд: </span>
-        <span className="font-bold">{step}</span>
+        <span className="font-bold">{state.step}</span>
       </div>
       <div className="absolute bottom-0 right-0 italic text-sm">{VERSION}</div>
     </div>

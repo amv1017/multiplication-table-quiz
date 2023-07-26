@@ -1,6 +1,6 @@
 {
   "name": "multiplication-table-quiz",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "MIT",
   "scripts": {
     "dev": "vite --port=3000 --host",
